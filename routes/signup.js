@@ -14,7 +14,7 @@ router.post('/', async (req, res) => {
                 password: await bcrypt.hash(req.body.password, 10)
             });
             result = await user.save();
-            console.log(typeof result);
+            // console.log(typeof result);
         }
         await createUser().then(r => res.send('User signup successfully....')).catch(err => res.status(400).send(err.message));
     }

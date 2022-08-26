@@ -8,7 +8,7 @@ req.body format                                user signup schema
 {
   "firstName": "Shubham",                       //{ type: String, trim: true, required: true }
   "lastName": "Verma",                          //{ type: String, trim: true, required: true }
-  "email": "shubham.verma@neosoftmail.com",     //{ type: String, required: true, trim: true, lowercase: true }
+  "email": "shubham.verma@neosoftmail.com",     //{ type: String, required: true, trim: true, lowercase: true, unique: true }
   "password": "abcdef",                         //String
   "confirmPassword": "abcdef"                   //String
 }
