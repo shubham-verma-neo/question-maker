@@ -1,4 +1,4 @@
-==================================================================================================================================================================================================
+==============================================================================================================================================================================================
 signup API
 
 post - http://localhost:8080/signup    (create new user to db)
@@ -13,7 +13,7 @@ req.body format                                user signup schema
   "confirmPassword": "abcdef"                   //String
 }
 
-==================================================================================================================================================================================================
+==============================================================================================================================================================================================
 
 login API
 
@@ -21,12 +21,12 @@ get - http://localhost:8080/login     (returns either success or rejected)
 
 req.query params
 
-parameters           value
+parameters             value
 
-email                    shubham.verma@neosoftmail.com
+email                shubham.verma@neosoftmail.com
 password             abcdef
 
-==================================================================================================================================================================================================
+==============================================================================================================================================================================================
 
 question paper API
 
@@ -62,7 +62,7 @@ req.body format                                   question paper schema
                     ]
 }
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 get papers from db
 
@@ -74,14 +74,14 @@ case 1
 
 parameters           value
 
-subject                 science, maths etc (if not mentioned returns all subject papers from db)
+subject            science, maths etc (if not mentioned returns all subject papers from db)
 questionType       mcq, true/false, brief (if not mentioned returns all question type papers from db)
 
 case 2
 
 parameters           value
 
-subject                 science (returns mentioned subject papers from db)
+subject            science (returns mentioned subject papers from db)
 questionType       --  (if not mentioned returns all science based question papers from db)
 OR
 questionType       mcq (returns mentioned subject  base mcq question type papers from db)
@@ -91,7 +91,7 @@ OR
 questionType       brief (returns mentioned subject base brief  question type papers from db)
 
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 get counts of papers
 
@@ -103,14 +103,14 @@ case 1
 
 parameters           value
 
-subject                 science, maths etc (if not mentioned returns all subject papers count from db)
+subject            science, maths etc (if not mentioned returns all subject papers count from db)
 questionType       mcq, true/false, brief (if not mentioned returns all question type papers counts from db)
 
 case 2
 
 parameters           value
 
-subject                 science (returns mentioned subject papers counts from db)
+subject            science (returns mentioned subject papers counts from db)
 questionType       --  (if not mentioned returns all mentioned subject based question papers counts from db)
 OR
 questionType       mcq (returns mentioned subject  base mcq question type papers counts from db)
@@ -119,7 +119,7 @@ questionType       true/false (returns mentioned subject base true/false  questi
 OR
 questionType       brief (returns mentioned subject base brief  question type papers counts from db)
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 add questions to paper
 
@@ -129,7 +129,7 @@ query params
 
 parameters           value
 
-id                          id of question collection (id of question paper in which question need to add)
+id                id of question collection (id of question paper in which question need to add)
 
 body format
 
@@ -149,7 +149,7 @@ body format
 }
 
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 remove questions from paper
 
@@ -159,7 +159,7 @@ query params
 
 parameters           value
 
-id                          id of question collection (id of question paper in which question need to remove)
+id                 id of question collection (id of question paper in which question need to remove)
 
 body format
 
@@ -167,5 +167,5 @@ body format
   "questions": [7,2,5]    //provided question number must be less than or equal to of total questions in paper otherwise error
 }
 
-==================================================================================================================================================================================================
+==============================================================================================================================================================================================
 
