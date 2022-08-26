@@ -3,14 +3,14 @@ signup API
 
 post - http://localhost:8080/signup    (create new user to db)
 
-req.body format                                                           user signup schema
+req.body format                                user signup schema
 
 {
-  "firstName": "Shubham",                                       //{ type: String, trim: true, required: true }
-  "lastName": "Verma",                                            //{ type: String, trim: true, required: true }
+  "firstName": "Shubham",                       //{ type: String, trim: true, required: true }
+  "lastName": "Verma",                          //{ type: String, trim: true, required: true }
   "email": "shubham.verma@neosoftmail.com",     //{ type: String, required: true, trim: true, lowercase: true }
-  "password": "abcdef",                                           //String
-  "confirmPassword": "abcdef"                                //String
+  "password": "abcdef",                         //String
+  "confirmPassword": "abcdef"                   //String
 }
 
 ==================================================================================================================================================================================================
@@ -163,8 +163,8 @@ id                          id of question collection (id of question paper in w
 
 body format
 
-{                                   //an array of question number 
-  "questions": [1,2,5]    //provided question number must be in the range of total questions in paper otherwise error
+{                         //an array of question number that need to delete
+  "questions": [7,2,5]    //provided question number must be less than or equal to of total questions in paper otherwise error
 }
 
 ==================================================================================================================================================================================================
