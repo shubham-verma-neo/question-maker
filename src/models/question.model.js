@@ -4,19 +4,11 @@ var mongoose = require("mongoose");
 const questionSchema = new mongoose.Schema({
     subject: {
         type: String,
-        trim: true,
-        required: true,
-        lowercase: true
+        required: true
     },
     questionType: {
         type: String,
-        trim: true,
-        required: true,
-        lowercase: true,
-        enum: {
-            values: ['mcq', 'true/false', 'brief'],
-            message: 'Question type should be "MCQ", "True/false", "Brief"..'
-        }
+        required: true
     },
     questions: [{
         question: {

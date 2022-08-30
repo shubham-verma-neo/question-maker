@@ -1,9 +1,10 @@
-
 const express = require('express');
 const router = express.Router();
-const { Questions } = require('../model/question.model');
+const { Questions } = require('../models/question.model');
+const verify = require('../middleware/verifyToken');
+const questionOptions = require('../middleware/questionOptions');
 
-router.get('/papers', async (req, res) => {
+router.get('/papers', verify, async (req, res) => {
     let papers;
     if (req.query.subject && req.query.questionType) {
         papers = await Questions
@@ -20,7 +21,7 @@ router.get('/papers', async (req, res) => {
     else if (req.query.questionType) {
         papers = await Questions
             .find({ questionType: req.query.questionType });
-        if (!papers) return;
+        if (!papers) return res.send(`No question paper with ${req.query.questionType} question type.`);
         else return res.send(papers);
     }
 
@@ -28,7 +29,7 @@ router.get('/papers', async (req, res) => {
     res.send(papers);
 });
 
-router.get('/counts', async (req, res) => {
+router.get('/counts', verify, async (req, res) => {
     let counts;
     if (req.query.subject && req.query.questionType) {
         counts = await Questions
@@ -52,17 +53,16 @@ router.get('/counts', async (req, res) => {
     res.send({ count: counts.length });
 })
 
-router.post('/new', async (req, res) => {
+router.post('/new', verify, questionOptions, async (req, res) => {
+    // router.post('/new', verify, async (req, res) => {
     async function saveQuestions() {
         let arr = [];
-        // console.log(req.body);
         await req.body.questions.forEach(element => {
             arr.push({
                 question: element.question,
                 answer: element.answer,
                 marks: element.marks
             })
-
         });
         await new Questions({
             subject: req.body.subject,
@@ -70,79 +70,54 @@ router.post('/new', async (req, res) => {
             questions: arr
         }).save();
     }
-    await saveQuestions().then(r => res.send('Question paper created and saved successfully....')).catch(err => res.status(400).send(err.message));
+    await saveQuestions()
+        .then(result => res.send('Question paper created and saved successfully....'))
+        .catch(err => res.status(400).send(err.message));
 });
 
-
-router.put('/add', async (req, res) => {
+router.put('/add', verify, questionOptions, async (req, res) => {
     let question = await Questions
-        .find({
-            _id: req.query.id
-        });
-        
-    // console.log(req.body);
-    await req.body.questions.forEach(element => {
-        question[0].questions.push({
-            question: element.question,
-            answer: element.answer,
-            marks: element.marks
-        });
-    });
+        .findById(
+            req.query.id
+        );
+    if (!question) {
+        let error = new Error('Question paper does not exist.')
+        return res.send(error.message)
+    }
 
-    let arr = question[0].questions;
-    // console.log(arr);
+    let arr = question.questions.concat(req.body.questions);
+    // console.log(arr)
 
-    let questionUpdated = await Questions
-        .find({
-            _id: req.query.id
-        })
-        .update({ 
-            questions: arr 
-        });
-
-    // console.log(questionUpdated);
-    res.send('Question updated successfully...');
+    try {
+        await Questions
+            .findOneAndUpdate({
+                _id: req.query.id
+            },
+                {
+                    questions: arr
+                }
+            );
+        res.send('Question updated successfully...');
+    } catch (error) {
+        res.status(400).send(error.message);
+        // console.log(error)
+    }
 })
 
-// router.put('/remove', async (req, res) => {
-//     const question = await Questions
-//         .find({
-//             _id: req.query.id
-//         });
+router.put('/remove', verify, async (req, res) => {
+    let question;
 
-//     if (req.query.question != 0 && req.query.question <= question[0].questions.length) {
+    question = await Questions
+        .findById(
+            req.query.id
+        );
+    if (!question) {
+        let error = new Error('Question paper does not exist.')
+        return res.send(error.message)
+    }
 
-//         let arr = question[0].questions;
-//         arr.splice(req.query.question - 1, 1);
-//         // console.log(arr);
+    let arr = question.questions;
 
-//         let questionUpdated = await Questions
-//             .find({
-//                 _id: req.query.id
-//             })
-//             .update({
-//                 questions: arr
-//             });
-
-//         // console.log(questionUpdated);
-//         return res.send('Question removed successfully...');
-//     }
-//     const err = new Error('Please enter valid question number to remove..');
-//     res.send(err.message);
-
-// })
-
-
-router.put('/remove', async (req, res) => {
-
-    // retrieve question paper by id
-    const question = await Questions
-        .find({
-            _id: req.query.id
-        });
-    let arr = question[0].questions;
-
-    // taking questions number array to remove..
     let index = req.body.question.sort(function (a, b) { return a - b });
     // console.log(index);
 
@@ -161,20 +136,23 @@ router.put('/remove', async (req, res) => {
         arr.splice((index[0] - 1), 1);
         index.splice(0, 1);
         for (let i = 0; i < index.length; i++) {
-            index[i] = index[i] - 1;
+            index[i] -= 1;
         }
         indexLen--
     }
-
-    let questionUpdated = await Questions
-        .find({
-            _id: req.query.id
-        })
-        .update({
-            questions: arr
-        });
-    // console.log(await questionUpdated);
-    res.send('Question removed successfully...');
+    try {
+        await Questions
+            .findById(
+                req.query.id
+            )
+            .update({
+                questions: arr
+            });
+        res.send('Question removed successfully...');
+    }
+    catch (error) {
+        res.send(error.message);
+    }
 });
 
 module.exports = router;
