@@ -8,24 +8,29 @@ router.get('/papers', verify, async (req, res) => {
     let papers;
     if (req.query.subject && req.query.questionType) {
         papers = await Questions
-            .find({ subject: req.query.subject, questionType: req.query.questionType });
+            .find({ subject: req.query.subject, questionType: req.query.questionType })
+            .populate('subject questionType questions', 'subjectName questionType -_id');
         if (!papers) return;
         else return res.send(papers);
     }
     else if (req.query.subject) {
         papers = await Questions
-            .find({ subject: req.query.subject });
+            .find({ subject: req.query.subject })
+            .populate('subject questionType questions', 'subjectName questionType -_id');
         if (!papers) return;
         else return res.send(papers);
     }
     else if (req.query.questionType) {
         papers = await Questions
-            .find({ questionType: req.query.questionType });
+            .find({ questionType: req.query.questionType })
+            .populate('subject questionType questions', 'subjectName questionType -_id');
         if (!papers) return res.send(`No question paper with ${req.query.questionType} question type.`);
         else return res.send(papers);
     }
 
-    papers = await Questions.find();
+    papers = await Questions
+        .find()
+        .populate('subject questionType questions', 'subjectName questionType -_id');
     res.send(papers);
 });
 

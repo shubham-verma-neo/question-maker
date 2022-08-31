@@ -3,11 +3,13 @@ var mongoose = require("mongoose");
 
 const questionSchema = new mongoose.Schema({
     subject: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'subject',
         required: true
     },
     questionType: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'questionType',
         required: true
     },
     questions: [{
