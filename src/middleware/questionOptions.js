@@ -1,6 +1,5 @@
 const { QuestionType } = require('../models/questionType.model');
 
-
 module.exports = async function (req, res, next) {
     let questionType;
     if (req.body.questionType) {
@@ -42,7 +41,6 @@ module.exports = async function (req, res, next) {
             }
         });
     }
-
     if (!error) {
         next();
     }
