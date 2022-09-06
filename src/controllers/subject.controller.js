@@ -1,4 +1,5 @@
 const { Subjects } = require('../models/subject.model');
+const { subjectAddedSuccess } = require('../middleware/message');
 
 //------------------------------------------------------------------------------------------------------------------//
 
@@ -8,7 +9,7 @@ const _new = async (req, res) => {
             subjectCode: req.body.subjectCode,
             subjectName: req.body.subjectName,
         }).save();
-        res.send(await subject);
+        res.send({message: subjectAddedSuccess, subject: subject});
     }
     catch (err) {
         res.status(400).send(err.message);

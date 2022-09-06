@@ -1,5 +1,5 @@
 const { QuestionType } = require('../models/questionType.model');
-
+const { questionTypeSuccess } = require('../middleware/message');
 //------------------------------------------------------------------------------------------------------------------//
 
 const _new = async (req, res) => {
@@ -7,7 +7,7 @@ const _new = async (req, res) => {
         const questionType = await new QuestionType({
             questionType: req.body.questionType,
         }).save();
-        res.send(questionType);
+        res.send({ message: questionTypeSuccess, questionType: questionType });
     }
     catch (err) {
         res.send(err.message);

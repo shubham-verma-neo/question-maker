@@ -1,23 +1,7 @@
 const { Users } = require('../models/userSignup.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
-//------------------------------------------------------------------------------------------------------------------//
-
-const login = async (req, res) => {
-    const user = await Users.findOne({ email: req.query.email });
-
-    if (!user) {
-        return res.status(401).send('Invalid username or password.');
-    }
-
-    if (! await bcrypt.compare(req.query.password, user.password)) {
-        return res.status(401).send('Invalid username or password.');
-    }
-
-    const token = jwt.sign({ _id: user._id }, 'klgjs');
-    res.header('auth-token', token).send(token);
-}
+const { signupSuccess, passwordNotMatch, invalidEmailPassword } = require('../middleware/message');
 
 //------------------------------------------------------------------------------------------------------------------//
 
@@ -32,14 +16,31 @@ const signup = async (req, res) => {
             });
             await user.save();
         }
-        await createUser().then(r => res.send('User signup successfully....')).catch(err => res.status(400).send(err.message));
+        await createUser().then(r => res.send(signupSuccess)).catch(err => res.status(400).send(err.message));
     }
     else {
-        const err = new Error('Password & Confirm Password does not match...');
+        const err = new Error(passwordNotMatch);
         console.log(err.message);
         res.status(400).send(err.message);
     }
     res.end();
+}
+
+//------------------------------------------------------------------------------------------------------------------//
+
+const login = async (req, res) => {
+    const user = await Users.findOne({ email: req.query.email });
+
+    if (!user) {
+        return res.status(401).send(invalidEmailPassword);
+    }
+
+    if (! await bcrypt.compare(req.query.password, user.password)) {
+        return res.status(401).send(invalidEmailPassword);
+    }
+
+    const token = jwt.sign({ _id: user._id }, 'klgjs');
+    res.header('auth-token', token).send(token);
 }
 
 //------------------------------------------------------------------------------------------------------------------//

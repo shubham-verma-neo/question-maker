@@ -1,5 +1,13 @@
 const { Questions } = require('../models/question.model');
-
+const {
+    subjectQuestionTypeRejected,
+    subjectRejected,
+    questionTypeRejected,
+    questionPaperSuccess,
+    questionPaperNotExists,
+    questionPaperExists,
+    questionNotExists,
+    questionRemoved } = require('../middleware/message');
 //------------------------------------------------------------------------------------------------------------------//
 
 const _papers = async (req, res) => {
@@ -8,21 +16,21 @@ const _papers = async (req, res) => {
         papers = await Questions
             .find({ subject: req.query.subject, questionType: req.query.questionType })
             .populate('subject questionType questions', 'subjectName questionType -_id');
-        if (!papers) return res.send(`No question paper with this selection.`);
+        if (!papers) return res.send(subjectQuestionTypeRejected);
         else return res.send(papers);
     }
     else if (req.query.subject) {
         papers = await Questions
             .find({ subject: req.query.subject })
             .populate('subject questionType questions', 'subjectName questionType -_id');
-        if (!papers) return res.send(`No question paper with ${req.query.subject} subject.`);
+        if (!papers) return res.send(subjectRejected);
         else return res.send(papers);
     }
     else if (req.query.questionType) {
         papers = await Questions
             .find({ questionType: req.query.questionType })
             .populate('subject questionType questions', 'subjectName questionType -_id');
-        if (!papers) return res.send(`No question paper with ${req.query.questionType} question type.`);
+        if (!papers) return res.send(questionTypeRejected);
         else return res.send(papers);
     }
 
@@ -39,19 +47,19 @@ const _counts = async (req, res) => {
     if (req.query.subject && req.query.questionType) {
         counts = await Questions
             .find({ subject: req.query.subject, questionType: req.query.questionType });
-        if (!counts) return;
+        if (!counts) return res.send(subjectQuestionTypeRejected);
         else return res.send({ count: counts.length });
     }
     else if (req.query.subject) {
         counts = await Questions
             .find({ subject: req.query.subject });
-        if (!counts) return;
+        if (!counts) return res.send(subjectRejected);
         else return res.send({ count: counts.length });
     }
     else if (req.query.questionType) {
         counts = await Questions
             .find({ questionType: req.query.questionType });
-        if (!counts) return;
+        if (!counts) return res.send(questionTypeRejected);
         else return res.send({ count: counts.length });
     }
     counts = await Questions.find();
@@ -78,7 +86,7 @@ const _new = async (req, res) => {
         }).save();
     }
     await saveQuestions()
-        .then(result => res.send('Question paper created and saved successfully....'))
+        .then(result => res.send(questionPaperSuccess))
         .catch(err => res.status(400).send(err.message));
 }
 
@@ -90,7 +98,7 @@ const _add = async (req, res) => {
             req.query.id
         );
     if (!question) {
-        let error = new Error('Question paper does not exist.')
+        let error = new Error(questionPaperNotExists)
         return res.send(error.message)
     }
 
@@ -106,7 +114,7 @@ const _add = async (req, res) => {
                     questions: arr
                 }
             );
-        res.send('Question updated successfully...');
+        res.send(questionPaperExists);
     } catch (error) {
         res.status(400).send(error.message);
         // console.log(error)
@@ -117,19 +125,22 @@ const _add = async (req, res) => {
 
 const _remove = async (req, res) => {
     let question;
-
-    question = await Questions
-        .findById(
-            req.query.id
-        );
+    try {
+        question = await Questions
+            .findById(
+                req.query.id
+            );
+    } catch (error) {
+        return res.send(error.message)
+    }
     if (!question) {
-        let error = new Error('Question paper does not exist.')
+        let error = new Error(questionPaperNotExists)
         return res.send(error.message)
     }
 
     let arr = question.questions;
 
-    let index = req.body.question.sort(function (a, b) { return a - b });
+    let index = req.body.questions.sort(function (a, b) { return a - b });
     // console.log(index);
 
     let indexLen = index.length;
@@ -137,7 +148,7 @@ const _remove = async (req, res) => {
 
 
     if (index[0] <= 0 || index[index.length - 1] > arr.length) {
-        err = new Error(`Invalid question number, it should be more than or equal to 1 and less than or equal to ${arr.length}.`);
+        err = new Error(questionNotExists);
         return res.status(400).send(err.message);
     }
 
@@ -159,7 +170,7 @@ const _remove = async (req, res) => {
             .update({
                 questions: arr
             });
-        res.send('Question removed successfully...');
+        res.send(questionRemoved);
     }
     catch (error) {
         res.send(error.message);
